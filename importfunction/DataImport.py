@@ -1,39 +1,29 @@
-from flask import abort
-from flask import make_response
 import os
+
+from flask import abort, jsonify
+from flask import make_response
 import json
 from google.cloud import storage, datastore
-from main import app
 
 PROJECT_ID = os.getenv('PROJECT_ID')
-SERVICE_ACCOUNT_JSON = os.getenv('SERVICE_ACCOUNT_JSON')
 BUCKET_NAME = os.getenv('BUCKET_NAME')
 
 
-@app.route('/main/', methods=['POST'])
-def import_function(request):
-    req = request.get_json(silent=True, force=True)
-    res = make_Response(req)
-    res = json.dumps(res, indent=4)
-    r = make_response(res)
-    r.headers['Content-Type'] = 'application/json'
-    return r
-
-
-def make_Response(req):
+def import_funct(request):
     # create storage client
     storage_client = storage.Client()
     # get bucket with name
     bucket = storage_client.get_bucket(BUCKET_NAME)
     # validate if a filename is provided or not
+    req = request.get_json(silent=True, force=True)
     if req is None:
-        abort(400, 'Please provide a filename')
+        abort(make_response(jsonify(message='Please provide a filename'), 400))
     if req.get("filename") is None or not req.get("filename"):
-        abort(400, 'Please provide a filename')
+        abort(make_response(jsonify(message='Please provide a filename'), 400))
     json_file = req.get("filename")
     # Validate the existance of the file in the bucket
     if not bucket.get_blob(json_file):
-        abort(400, 'Please provide a valid filename')
+        abort(make_response(jsonify(message='Please provide a valid filename'), 400))
     # get bucket data as blob
     blob = bucket.get_blob(json_file)
     data = json.loads(blob.download_as_string())
@@ -49,6 +39,7 @@ def make_Response(req):
         # update datastore entity with the imported json
         imported_json.update(i)
         datastore.Client(PROJECT_ID).put(imported_json)
-    return "Json uploaded successfully to Datastore"
 
-
+    r = make_response(jsonify({'message': "Json uploaded successfully to Datastore"}), 201)
+    r.headers['Content-Type'] = 'application/json'
+    return r
