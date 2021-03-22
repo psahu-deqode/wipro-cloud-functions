@@ -9,7 +9,7 @@ from fullfillment.app_launch import app_launch
 app = Flask(__name__)
 
 
-logging.basicConfig(filename='wipro_cloud_functions.log', level=logging.DEBUG,
+logging.basicConfig(filename='cloud_functions.log', level=logging.DEBUG,
                     format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 

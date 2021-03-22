@@ -1,8 +1,7 @@
-from google.cloud import datastore
 from flask import make_response, jsonify, abort
 
 from main import app
-from lib.datastore import PROJECT_ID, publisher
+from lib.datastore import publisher, search
 
 
 def app_launch(request):
@@ -14,11 +13,11 @@ def app_launch(request):
         if app_name is None or app_name == "":
             app.logger.info('app_name was not provided.')
             abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
+        filter = [
+            {"synonyms", ">=", app_name},
+            {"synonyms", "<=",  app_name + "z"}]
 
-        entities = datastore.Client(PROJECT_ID).query(kind="SupportedAppList")
-        entities.add_filter("synonyms", ">=", app_name)
-        entities.add_filter("synonyms", "<=", app_name + "z")
-        result = list(entities.fetch())
+        result = search("SupportedAppList", filter)
 
         if len(result) == 0:
             app.logger.info('Records not found in Datastore')
