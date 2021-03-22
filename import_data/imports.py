@@ -1,12 +1,10 @@
-import os
-
 from flask import abort, jsonify
 from flask import make_response
 import json
 from google.cloud import storage, datastore
 
-PROJECT_ID = os.getenv('PROJECT_ID')
-BUCKET_NAME = os.getenv('BUCKET_NAME')
+from main import app
+from lib.datastore import BUCKET_NAME, PROJECT_ID
 
 
 def import_funct(request):
@@ -16,17 +14,26 @@ def import_funct(request):
     bucket = storage_client.get_bucket(BUCKET_NAME)
     # validate if a filename is provided or not
     request_json_data = request.get_json(silent=True, force=True)
+
     if request_json_data is None:
+        app.logger.info('Invalid request in Import data function')
         abort(make_response(jsonify(message='Please provide a filename'), 400))
-    if request_json_data.get("filename") is None or not req.get("filename"):
+
+    if request_json_data.get("filename") is None or not request_json_data.get("filename"):
+        app.logger.info('Invalid filename  in Import data function request')
         abort(make_response(jsonify(message='Please provide a filename'), 400))
+
     json_file = request_json_data.get("filename")
     # Validate the existance of the file in the bucket
+
     if not bucket.get_blob(json_file):
+        app.logger.info('Invalid file name passed in the request')
         abort(make_response(jsonify(message='Please provide a valid filename'), 400))
+
     # get bucket data as blob
     blob = bucket.get_blob(json_file)
     data = json.loads(blob.download_as_string())
+
     for i in data['ContentsList']:
         # append details to each json in ContentsList
         i['DocumentNo'] = data['DocumentNo']
