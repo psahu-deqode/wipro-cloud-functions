@@ -14,7 +14,7 @@ def query(request):
         abort(make_response(jsonify(message='Please provide a valid key to search'), 400))
 
     key = request_json_data.get("key")
-    filters = [{"UnitName", "=", key}]
+    filters = [{"column": "UnitName", "operator": "=", "key": key}]
     result = search("data", filters)
 
     if not result:

@@ -13,7 +13,7 @@ storage_client = storage.Client()
 def search(kind, filters):
     entities = datastore.Client(PROJECT_ID).query(kind=kind)
     for i in filters:
-        entities.add_filter(i)
+        entities.add_filter(i["column"], i["operator"], i["key"])
     result = list(entities.fetch())
     return result
 

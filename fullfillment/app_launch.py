@@ -6,7 +6,6 @@ from lib.pubsub import send_message
 
 
 def app_launch(request):
-
     try:
         request_json_data = request.get_json(silent=True, force=True)
         app_name = request_json_data.get("queryResult").get("parameters").get("LaunchApplication").lower()
@@ -16,9 +15,8 @@ def app_launch(request):
             abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
 
         filters = [
-            {"synonyms", ">=", app_name},
-            {"synonyms", "<=",  app_name + "z"}]
-
+            {'column': "synonyms", 'operator': ">=", "key": app_name},
+            {'column': "synonyms", 'operator': ">=", "key": app_name + "z"}]
         result = search("SupportedAppList", filters)
 
         if len(result) == 0:
@@ -33,9 +31,10 @@ def app_launch(request):
 
         launch_app_json = {
             "category": "APPLAUNCH",
-            "package_id": result[0].package,
+            "package_id": result[0].get("package"),
             "name": app_name
         }
+
         topic_name = "topic_" + vehicle_vin
         message = b'("launching_app" + app_name)'
         send_message(topic_name, message, launch_app_json)
