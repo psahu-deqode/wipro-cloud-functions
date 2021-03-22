@@ -1,7 +1,8 @@
 from flask import make_response, jsonify, abort
 
 from main import app
-from lib.datastore import publisher, search
+from lib.datastore import search
+from lib.pubsub import send_message
 
 
 def app_launch(request):
@@ -13,11 +14,12 @@ def app_launch(request):
         if app_name is None or app_name == "":
             app.logger.info('app_name was not provided.')
             abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
-        filter = [
+
+        filters = [
             {"synonyms", ">=", app_name},
             {"synonyms", "<=",  app_name + "z"}]
 
-        result = search("SupportedAppList", filter)
+        result = search("SupportedAppList", filters)
 
         if len(result) == 0:
             app.logger.info('Records not found in Datastore')
@@ -35,12 +37,10 @@ def app_launch(request):
             "name": app_name
         }
         topic_name = "topic_" + vehicle_vin
-        publisher.create_topic(topic_name)
-        publisher.publish(topic_name, b'("launching_app" + app_name)', launch_app_json)
-        r = make_response(jsonify(fulfillmentText=f'launching_app + {app_name}'), 200)
-        r.headers['Content-Type'] = 'application/json'
-        return r
+        message = b'("launching_app" + app_name)'
+        send_message(topic_name, message, launch_app_json)
+
+        return make_response(jsonify(fulfillmentText=f'launching_app + {app_name}'), 200)
 
     except:
-
         abort(make_response(jsonify(fulfillmentText='Requested activity cannot be fulfilled.'), 400))

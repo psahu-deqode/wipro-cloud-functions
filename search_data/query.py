@@ -26,6 +26,4 @@ def query(request):
             list1.append(i)
         data = list1
 
-    r = make_response(jsonify({"data": data}), 200)
-    r.headers['Content-Type'] = 'application/json'
-    return r
+    return make_response(jsonify({"data": data}), 200)

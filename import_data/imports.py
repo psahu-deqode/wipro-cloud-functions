@@ -24,7 +24,7 @@ def import_funct(request):
         abort(make_response(jsonify(message='Please provide a filename'), 400))
 
     json_file = request_json_data.get("filename")
-    # Validate the existance of the file in the bucket
+    # Validate the existence of the file in the bucket
 
     if not bucket.get_blob(json_file):
         app.logger.info('Invalid file name passed in the request')
@@ -47,6 +47,4 @@ def import_funct(request):
         imported_json.update(i)
         datastore.Client(PROJECT_ID).put(imported_json)
 
-    r = make_response(jsonify({'message': "Json uploaded successfully to Datastore"}), 201)
-    r.headers['Content-Type'] = 'application/json'
-    return r
+    return make_response(jsonify({'message': "Json uploaded successfully to Datastore"}), 201)
