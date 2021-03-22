@@ -1,13 +1,10 @@
+from import_data.imports import import_funct
+from search_data.query import query
+from fullfillment.app_launch import process_handle_app_launch
 import os
-
 from flask import Flask
 
-from fullfillment.fullfillmentcontroller import process_handle_app_launch
-
 app = Flask(__name__)
-
-from importfunction.DataImport import import_funct
-from queryfunction.Query import query
 
 
 @app.route('/query/', methods=['POST'])

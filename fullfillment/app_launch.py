@@ -1,7 +1,6 @@
-import json
 import os
 
-from flask import make_response, jsonify
+from flask import make_response, jsonify, abort
 from google.cloud import pubsub, datastore
 
 PROJECT_ID = os.getenv('PROJECT_ID')
@@ -14,17 +13,16 @@ def process_handle_app_launch(request):
         req = request.get_json(silent=True, force=True)
         appName = req.get("queryResult").get("parameters").get("LaunchApplication").lower()
         if appName is None or appName == "":
-            return {'fulfillmentText': "Requested activity cannot be fulfilled"}
+            abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
         entities = datastore.Client(PROJECT_ID).query(kind="SupportedAppList")
         entities.add_filter("synonyms", ">=", appName)
         entities.add_filter("synonyms", "<=", appName + "z")
         result = list(entities.fetch())
         if len(result) == 0:
-            return {'fulfillmentText': "Requested activity cannot be fulfilled."}
-        r = make_response(jsonify({"fulfillmentText": "launching_app" + appName}, 200))
+            abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
         vehicleVin = req.get("originalDetectIntentRequest").get("payload").get("vin")
         if vehicleVin is None:
-            return {'fulfillmentText': "VIN not found in payload. Hence cannot send msg."}
+            abort(make_response(jsonify(fulfilmentText='VIN not found in payload. Hence cannot send msg.'), 400))
         launchAppJson = {
             "category": "APPLAUNCH",
             "package_id": result[0].package,
@@ -33,8 +31,8 @@ def process_handle_app_launch(request):
         topicName = "topic_" + vehicleVin
         publisher.create_topic(topicName)
         publisher.publish(topicName, b'("launching_app" + appName)', launchAppJson)
-
+        r = make_response(jsonify(fulfillmentText=f'launching_app + {appName}'), 200)
+        r.headers['Content-Type'] = 'application/json'
+        return r
     except:
-        r = make_response(jsonify({'fulfillmentText': "Requested activity cannot be fulfilled."}, 200))
-    r.headers['Content-Type'] = 'application/json'
-    return r
+        abort(make_response(jsonify(fulfillmentText='Requested activity cannot be fulfilled.'), 400))
