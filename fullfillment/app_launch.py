@@ -1,6 +1,6 @@
 from flask import make_response, jsonify, abort
 
-from main import app
+from lib import logger
 from lib.datastore import search
 from lib.pubsub import send_message
 
@@ -12,7 +12,7 @@ def app_launch(request):
         app_name = request_json_data.get("queryResult").get("parameters").get("LaunchApplication").lower()
 
         if app_name is None or app_name == "":
-            app.logger.info('app_name was not provided.')
+            logger.info('app_name was not provided.')
             abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
 
         filters = [
@@ -22,13 +22,13 @@ def app_launch(request):
         result = search("SupportedAppList", filters)
 
         if len(result) == 0:
-            app.logger.info('Records not found in Datastore')
+            logger.info('Records not found in Datastore')
             abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
 
         vehicle_vin = request_json_data.get("originalDetectIntentRequest").get("payload").get("vin")
 
         if vehicle_vin is None:
-            app.logger.info('vehicle_vin not found in payload')
+            logger.info('vehicle_vin not found in payload')
             abort(make_response(jsonify(fulfilmentText='VIN not found in payload. Hence cannot send msg.'), 400))
 
         launch_app_json = {

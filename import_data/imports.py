@@ -1,10 +1,10 @@
 from flask import abort, jsonify
 from flask import make_response
 import json
-from google.cloud import storage, datastore
+from google.cloud import storage
 
-from main import app
-from lib.datastore import BUCKET_NAME, PROJECT_ID
+from lib import logger
+from lib.datastore import BUCKET_NAME, create_entity
 
 
 def import_funct(request):
@@ -16,18 +16,18 @@ def import_funct(request):
     request_json_data = request.get_json(silent=True, force=True)
 
     if request_json_data is None:
-        app.logger.info('Invalid request in Import data function')
+        logger.info('Invalid request in Import data function')
         abort(make_response(jsonify(message='Please provide a filename'), 400))
 
     if request_json_data.get("filename") is None or not request_json_data.get("filename"):
-        app.logger.info('Invalid filename  in Import data function request')
+        logger.info('Invalid filename  in Import data function request')
         abort(make_response(jsonify(message='Please provide a filename'), 400))
 
     json_file = request_json_data.get("filename")
     # Validate the existence of the file in the bucket
 
     if not bucket.get_blob(json_file):
-        app.logger.info('Invalid file name passed in the request')
+        logger.info('Invalid file name passed in the request')
         abort(make_response(jsonify(message='Please provide a valid filename'), 400))
 
     # get bucket data as blob
@@ -39,12 +39,13 @@ def import_funct(request):
         i['DocumentNo'] = data['DocumentNo']
         i['LanguageCode'] = data['LanguageCode']
         i['Version'] = data['Version']
+
         # Converted comma separated unit names to Array so it will be easier to search
         i['UnitName'] = i['UnitName'].split(', ') if len(i['UnitName']) != 0 else i['UnitName']
+
         # create datastore entity
-        imported_json = datastore.Entity(key=datastore.Client(PROJECT_ID).key("data"))
-        # update datastore entity with the imported json
-        imported_json.update(i)
-        datastore.Client(PROJECT_ID).put(imported_json)
+        kind = "data"
+        data = i
+        create_entity(kind, data)
 
     return make_response(jsonify({'message': "Json uploaded successfully to Datastore"}), 201)

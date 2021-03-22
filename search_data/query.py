@@ -1,9 +1,8 @@
 from flask import make_response
 from flask import abort, jsonify
-from google.cloud import datastore
 
-from main import app
-from lib.datastore import PROJECT_ID
+from lib import logger
+from lib.datastore import search
 
 
 def query(request):
@@ -11,19 +10,17 @@ def query(request):
     list1 = []
 
     if request_json_data is None or request_json_data.get('key') is None:
-        app.logger.info('Query function is invoked without the key parameter')
+        logger.info('Query function is invoked without the key parameter')
         abort(make_response(jsonify(message='Please provide a valid key to search'), 400))
 
     key = request_json_data.get("key")
-    entities = datastore.Client(PROJECT_ID).query(kind="data")
-    entities.add_filter("UnitName", "=", key)
-    entities_list = list(entities.fetch())
+    filters = [{"UnitName", "=", key}]
+    result = search("data", filters)
 
-    if not entities_list:
+    if not result:
         data = "No result is returned"
     else:
-        for i in entities_list:
+        for i in result:
             list1.append(i)
         data = list1
-
-    return make_response(jsonify({"data": data}), 200)
+    return make_response(jsonify(data=data), 200)
