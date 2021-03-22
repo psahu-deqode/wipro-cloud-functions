@@ -2,6 +2,8 @@ import os
 
 from flask import Flask
 
+from fullfillment.fullfillmentcontroller import process_handle_app_launch
+
 app = Flask(__name__)
 
 from importfunction.DataImport import import_funct
@@ -17,6 +19,12 @@ def query_entity(request):
 @app.route('/main/', methods=['POST'])
 def import_function(request):
     response = import_funct(request)
+    return response
+
+
+@app.route('/webhook/', methods=['POST'])
+def webhook(request):
+    response = process_handle_app_launch(request)
     return response
 
 
