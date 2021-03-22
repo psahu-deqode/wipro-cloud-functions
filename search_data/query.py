@@ -8,11 +8,11 @@ BUCKET_NAME = os.getenv('BUCKET_NAME')
 
 
 def query(request):
-    req = request.get_json(silent=True, force=True)
+    request_json_data = request.get_json(silent=True, force=True)
     list1 = []
-    if req is None or req.get('key') is None:
+    if request_json_data is None or request_json_data.get('key') is None:
         abort(make_response(jsonify(message='Please provide a valid key to search'), 400))
-    key = req.get("key")
+    key = request_json_data.get("key")
     entities = datastore.Client(PROJECT_ID).query(kind="data")
     entities.add_filter("UnitName", "=", key)
     entities_list = list(entities.fetch())

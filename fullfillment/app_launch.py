@@ -10,28 +10,28 @@ publisher = pubsub.PublisherClient()
 
 def process_handle_app_launch(request):
     try:
-        req = request.get_json(silent=True, force=True)
-        appName = req.get("queryResult").get("parameters").get("LaunchApplication").lower()
-        if appName is None or appName == "":
+        request_json_data = request.get_json(silent=True, force=True)
+        app_name = request_json_data.get("queryResult").get("parameters").get("LaunchApplication").lower()
+        if app_name is None or app_name == "":
             abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
         entities = datastore.Client(PROJECT_ID).query(kind="SupportedAppList")
-        entities.add_filter("synonyms", ">=", appName)
-        entities.add_filter("synonyms", "<=", appName + "z")
+        entities.add_filter("synonyms", ">=", app_name)
+        entities.add_filter("synonyms", "<=", app_name + "z")
         result = list(entities.fetch())
         if len(result) == 0:
             abort(make_response(jsonify(fulfilmentText='Requested activity cannot be fulfilled.'), 400))
-        vehicleVin = req.get("originalDetectIntentRequest").get("payload").get("vin")
-        if vehicleVin is None:
+        vehicle_vin = request_json_data.get("originalDetectIntentRequest").get("payload").get("vin")
+        if vehicle_vin is None:
             abort(make_response(jsonify(fulfilmentText='VIN not found in payload. Hence cannot send msg.'), 400))
-        launchAppJson = {
+        launch_app_json = {
             "category": "APPLAUNCH",
             "package_id": result[0].package,
-            "name": appName
+            "name": app_name
         }
-        topicName = "topic_" + vehicleVin
-        publisher.create_topic(topicName)
-        publisher.publish(topicName, b'("launching_app" + appName)', launchAppJson)
-        r = make_response(jsonify(fulfillmentText=f'launching_app + {appName}'), 200)
+        topic_name = "topic_" + vehicle_vin
+        publisher.create_topic(topic_name)
+        publisher.publish(topic_name, b'("launching_app" + app_name)', launch_app_json)
+        r = make_response(jsonify(fulfillmentText=f'launching_app + {app_name}'), 200)
         r.headers['Content-Type'] = 'application/json'
         return r
     except:

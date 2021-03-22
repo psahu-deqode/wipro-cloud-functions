@@ -15,12 +15,12 @@ def import_funct(request):
     # get bucket with name
     bucket = storage_client.get_bucket(BUCKET_NAME)
     # validate if a filename is provided or not
-    req = request.get_json(silent=True, force=True)
-    if req is None:
+    request_json_data = request.get_json(silent=True, force=True)
+    if request_json_data is None:
         abort(make_response(jsonify(message='Please provide a filename'), 400))
-    if req.get("filename") is None or not req.get("filename"):
+    if request_json_data.get("filename") is None or not req.get("filename"):
         abort(make_response(jsonify(message='Please provide a filename'), 400))
-    json_file = req.get("filename")
+    json_file = request_json_data.get("filename")
     # Validate the existance of the file in the bucket
     if not bucket.get_blob(json_file):
         abort(make_response(jsonify(message='Please provide a valid filename'), 400))
