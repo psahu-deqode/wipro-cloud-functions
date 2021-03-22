@@ -1,9 +1,13 @@
 import os
+from flask import abort, make_response, jsonify
+from google.cloud import datastore, storage
 
-from google.cloud import datastore
+from lib import logger
 
 PROJECT_ID = os.getenv('PROJECT_ID')
 BUCKET_NAME = os.getenv('BUCKET_NAME')
+
+storage_client = storage.Client()
 
 
 def search(kind, filters):
@@ -19,3 +23,16 @@ def create_entity(kind, data):
     imported_json.update(data)
     datastore.Client(PROJECT_ID).put(imported_json)
     return
+
+
+def create_blob(json_file):
+    # get bucket with name
+    bucket = storage_client.get_bucket(BUCKET_NAME)
+
+    if not bucket.get_blob(json_file):
+        logger.info('Invalid file name passed in the request')
+        abort(make_response(jsonify(message='Please provide a valid filename'), 400))
+
+    # get bucket data as blob
+    blob = bucket.get_blob(json_file)
+    return blob

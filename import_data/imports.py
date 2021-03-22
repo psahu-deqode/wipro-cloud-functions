@@ -4,15 +4,10 @@ import json
 from google.cloud import storage
 
 from lib import logger
-from lib.datastore import BUCKET_NAME, create_entity
+from lib.datastore import BUCKET_NAME, create_entity, create_blob
 
 
 def import_funct(request):
-    # create storage client
-    storage_client = storage.Client()
-    # get bucket with name
-    bucket = storage_client.get_bucket(BUCKET_NAME)
-    # validate if a filename is provided or not
     request_json_data = request.get_json(silent=True, force=True)
 
     if request_json_data is None:
@@ -24,14 +19,7 @@ def import_funct(request):
         abort(make_response(jsonify(message='Please provide a filename'), 400))
 
     json_file = request_json_data.get("filename")
-    # Validate the existence of the file in the bucket
-
-    if not bucket.get_blob(json_file):
-        logger.info('Invalid file name passed in the request')
-        abort(make_response(jsonify(message='Please provide a valid filename'), 400))
-
-    # get bucket data as blob
-    blob = bucket.get_blob(json_file)
+    blob = create_blob(json_file)
     data = json.loads(blob.download_as_string())
 
     for i in data['ContentsList']:
