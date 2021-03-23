@@ -11,11 +11,11 @@ def import_data(request):
     request_json_data = request.get_json(silent=True, force=True)
 
     if request_json_data is None:
-        logger.info('Invalid request in Import data function')
+        logger.logging.info('Invalid request in Import data function')
         abort(make_response(jsonify(message='Please provide a filename'), 400))
 
     if request_json_data.get("filename") is None or not request_json_data.get("filename"):
-        logger.info('Invalid filename  in Import data function request')
+        logger.logging.info('Invalid filename  in Import data function request')
         abort(make_response(jsonify(message='Please provide a filename'), 400))
 
     json_file = request_json_data.get("filename")
