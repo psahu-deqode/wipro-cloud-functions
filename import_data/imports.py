@@ -1,13 +1,13 @@
+import json
 from flask import abort, jsonify
 from flask import make_response
-import json
 
 
 from lib import logger
 from lib.datastore import create_entity, create_blob
 
 
-def import_funct(request):
+def import_data(request):
     request_json_data = request.get_json(silent=True, force=True)
 
     if request_json_data is None:

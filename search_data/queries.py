@@ -5,7 +5,7 @@ from lib import logger
 from lib.datastore import search
 
 
-def query(request):
+def search_data(request):
     request_json_data = request.get_json(silent=True, force=True)
     list1 = []
 

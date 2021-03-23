@@ -1,31 +1,31 @@
 import os
 from flask import Flask
 
-from search_data import query
-from import_data import imports
-from fullfillment import app_launch
+from search_data import queries as query_data
+from import_data import imports as data_import
+from fullfillment import app_launch as handle_app_launch
 
 app = Flask(__name__)
 
 
 @app.route('/query/', methods=['POST'])
-def query_entity(request):
+def search_data(request):
     app.logger.info('Search data function is invoked')
-    response = query.query(request)
+    response = query_data.search_data(request)
     return response
 
 
 @app.route('/main/', methods=['POST'])
-def import_function(request):
+def import_data(request):
     app.logger.info('Data import function is invoked')
-    response = imports.import_funct(request)
+    response = data_import.import_data(request)
     return response
 
 
 @app.route('/webhook/', methods=['POST'])
-def handle_app_launch(request):
+def app_launch(request):
     app.logger.info('Fulfillment app launch function is invoked')
-    response = app_launch.app_launch(request)
+    response = handle_app_launch.app_launch(request)
     return response
 
 
