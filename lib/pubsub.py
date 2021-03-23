@@ -1,12 +1,14 @@
-from google import pubsub
+from google.cloud import pubsub_v1
+from google.oauth2 import service_account
 
-import main
+from lib.datastore import PROJECT_ID
 
-publisher = pubsub.PublisherClient()
+credentials = service_account.Credentials
+publisher = pubsub_v1.PublisherClient(credentials=credentials)
 
 
-def send_message(topic_name, message, launch_app_json):
-    publisher.create_topic(topic_name)
-    publisher.publish(topic_name, message, launch_app_json)
-    main.app.logger.info('Message sent to Vehicle.')
+def send_message(topic_name, launch_app_json):
+    topic_path = publisher.topic_path(PROJECT_ID, topic_name)
+    publisher.publish(topic_path, str(launch_app_json).encode("utf-8"))
     return
+

@@ -34,10 +34,8 @@ def app_launch(request):
             "package_id": result[0].get("package"),
             "name": app_name
         }
-
         topic_name = "topic_" + vehicle_vin
-        message = b'("launching_app" + app_name)'
-        send_message(topic_name, message, launch_app_json)
+        send_message(topic_name, launch_app_json)
 
         return make_response(jsonify(fulfillmentText=f'launching_app + {app_name}'), 200)
 

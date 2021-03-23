@@ -1,10 +1,10 @@
 from flask import abort, jsonify
 from flask import make_response
 import json
-from google.cloud import storage
+
 
 from lib import logger
-from lib.datastore import BUCKET_NAME, create_entity, create_blob
+from lib.datastore import create_entity, create_blob
 
 
 def import_funct(request):
