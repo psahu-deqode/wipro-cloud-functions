@@ -30,6 +30,13 @@ def app_launch(request):
     return response
 
 
+@app.route('/indicator/', methods=['POST'])
+def handle_indicator(request):
+    logger.logging.info('Fulfillment app launch function is invoked')
+    response = handle_indicator.process_handle_indicator(request)
+    return response
+
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port %d" % port)
