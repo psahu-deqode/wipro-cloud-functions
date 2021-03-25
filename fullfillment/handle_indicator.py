@@ -1,6 +1,6 @@
 from lib import logger
-from lib.common import get_vehicle_vin
 from lib.datastore import search
+from lib.common import get_vehicle_vin
 from flask import abort, make_response, jsonify
 
 
@@ -13,7 +13,7 @@ def process_handle_indicator(request):
         logger.logging.info({'indicatorColor': indicator_color, 'indicatorStatus': indicator_status, 'indicatorType': indicator_type})
         vehicle_vin = get_vehicle_vin(request_json_data)
 
-        filter = {"column": "vin", "by": "=", "search": vehicle_vin}
+        filter = {"column": "vin", "operator": "=", "key": vehicle_vin}
         result = search('VehicleStatus', filter)
 
         if len(result) == 0:

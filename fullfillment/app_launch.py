@@ -35,8 +35,7 @@ def app_launch(request):
             "name": app_name
         }
         # topic_name = "topic_" + vehicle_vin
-        topic_name = "projects/tripbot-cloud/topics/topic"
-        send_message(topic_name, launch_app_json, vehicle_vin)
+        send_message(launch_app_json, vehicle_vin)
 
         return make_response(jsonify(fulfillmentText=f'launching_app {app_name}'), 200)
 

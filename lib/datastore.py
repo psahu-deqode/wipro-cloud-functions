@@ -9,16 +9,19 @@ BUCKET_NAME = os.getenv('BUCKET_NAME')
 storage_client = storage.Client()
 
 
-def search(kind, filters):
+def search(kind, filters=None):
     entities = datastore.Client(PROJECT_ID).query(kind=kind)
-    for i in filters:
-        entities.add_filter(i["column"], i["operator"], i["key"])
+    if filters is not None:
+        for i in filters:
+            entities.add_filter(i["column"], i["operator"], i["key"])
     result = list(entities.fetch())
     return result
 
 
-def create_entity(kind, data):
-    imported_json = datastore.Entity(key=datastore.Client(PROJECT_ID).key(kind))
+def create_entity(kind, data, key=None):
+    if key is None:
+        key = datastore.Client(PROJECT_ID).key(kind)
+    imported_json = datastore.Entity(key=key)
     imported_json.update(data)
     datastore.Client(PROJECT_ID).put(imported_json)
     return

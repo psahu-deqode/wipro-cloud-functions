@@ -3,3 +3,4 @@ functions-framework==2.1.2
 google-cloud-datastore==2.1.0
 google-cloud-pubsub==2.3.0
 google-cloud-storage==1.36.2
+google-cloud-dialogflow==2.1.0
