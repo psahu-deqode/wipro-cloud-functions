@@ -14,7 +14,7 @@
 
 ### Deployment command for handle_indicator cloud function : 
 
- gcloud functions deploy handle_indicator --runtime python37 --trigger-http --allow-unauthenticated
+ gcloud functions deploy indicator --runtime python37 --trigger-http --allow-unauthenticated
 
 ### Deployment command for routing cloud function : 
 

@@ -1,27 +1,23 @@
 import os
-
 import requests
-from google.cloud import dialogflow
+from pylogflow import Agent, IntentMap
 
-from lib.datastore import PROJECT_ID
 
-dialogflow.AgentsClient.agent_path(PROJECT_ID)
-
+agent = Agent()
 APP_LAUNCH_FUNCTION_URL = os.getenv('APP_LAUNCH_FUNCTION_URL')
 INDICATOR_FUNCTION_URL = os.getenv('INDICATOR_FUNCTION_URL')
 
 
-def router(request):
-    request_body = request.get_json(silent=True)
+def route_app_launch(request):
+    result = requests.post(APP_LAUNCH_FUNCTION_URL, json=request).text
+    return result
 
-    def handle_app_launch(request_body):
-        return requests.post(APP_LAUNCH_FUNCTION_URL, json=request_body).text
 
-    def handle_indicator(request_body):
-        return requests.post(INDICATOR_FUNCTION_URL, json=request_body).text
+def route_indicator(request):
+    result = requests.post(INDICATOR_FUNCTION_URL, json=request).text
+    return result
 
-    if request_body.get('queryResult').get('intent').get("displayName") == 'launchApplication':
-        return handle_app_launch(request_body)
 
-    if request_body.get('queryResult').get('intent').get("displayName") == 'indicator':
-        return handle_indicator(request_body)
+intentMap = IntentMap()
+intentMap.add('launchApplication', route_app_launch)
+intentMap.add('indicator', route_indicator)
