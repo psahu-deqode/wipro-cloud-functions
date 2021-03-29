@@ -4,10 +4,13 @@ from lib.pubsub import send_message
 from fullfillment.router import agent
 
 
-def app_launch(request):
-
+def process_app_launch(request):
     try:
-        request_json_data = request.get_json(silent=True, force=True)
+        if type(request) != dict:
+            request_json_data = request.get_json(silent=True, force=True)
+        else:
+            request_json_data = request
+
         app_name = request_json_data.get("queryResult").get("parameters").get("LaunchApplication").lower()
 
         if app_name is None or app_name == "":

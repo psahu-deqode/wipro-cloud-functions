@@ -12,7 +12,7 @@
 
  gcloud functions deploy app_launch --runtime python37 --trigger-http --allow-unauthenticated
 
-### Deployment command for handle_indicator cloud function : 
+### Deployment command for indicator cloud function : 
 
  gcloud functions deploy indicator --runtime python37 --trigger-http --allow-unauthenticated
 

@@ -9,8 +9,7 @@ INDICATOR_FUNCTION_URL = os.getenv('INDICATOR_FUNCTION_URL')
 
 
 def route_app_launch(request):
-    result = requests.post(APP_LAUNCH_FUNCTION_URL, json=request).text
-    return result
+    return requests.post(APP_LAUNCH_FUNCTION_URL, json=request).text
 
 
 def route_indicator(request):

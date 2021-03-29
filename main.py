@@ -8,7 +8,6 @@ from import_data import imports as data_import
 from fullfillment import indicator as handle_indicator
 from fullfillment import app_launch as handle_app_launch
 
-
 app = Flask(__name__)
 
 
@@ -29,7 +28,7 @@ def import_data(request):
 @app.route('/webhook/', methods=['POST'])
 def app_launch(request):
     logger.logging.info('Fulfillment app launch function is invoked')
-    response = handle_app_launch.app_launch(request)
+    response = handle_app_launch.process_app_launch(request)
     return response
 
 
