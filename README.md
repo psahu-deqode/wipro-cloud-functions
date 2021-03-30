@@ -16,6 +16,14 @@
 
  gcloud functions deploy indicator --runtime python37 --trigger-http --allow-unauthenticated
 
+### Deployment command for hud_rel cloud function : 
+
+ gcloud functions deploy hud_rel --runtime python37 --trigger-http --allow-unauthenticated
+
+### Deployment command for amb_light cloud function : 
+
+ gcloud functions deploy amb_light --runtime python37 --trigger-http --allow-unauthenticated
+
 ### Deployment command for routing cloud function : 
 
  gcloud functions deploy routing --runtime python37 --trigger-http --allow-unauthenticated
