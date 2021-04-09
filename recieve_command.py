@@ -5,7 +5,6 @@ import ssl
 import jwt
 import paho.mqtt.client as mqtt
 
-
 algorithm = os.getenv("ALGORITHM")
 ca_certs = os.getenv("CA_CERTS")
 cloud_region = os.getenv("CLOUD_REGION")
@@ -130,16 +129,20 @@ def get_client(args):
     return client
 
 
-def main():
-    args = parse_command_line_args()
+def mqtt_device_demo():
     """Connects a device, sends data, and receives data."""
-
+    # [START iot_mqtt_run]
+    args = parse_command_line_args()
     client = get_client(args)
-
+    # Publish num_messages messages to the MQTT bridge once per second.
     for i in range(1, listen_dur):
         # Process network events.
         client.loop()
+        # payload = "{}/{}-payload-{}".format(args.registry_id, args.device_id, i)
+        # print("Publishing message {}/{}: '{}'".format(i, args.num_messages, payload))
+
+    # [END iot_mqtt_run]
 
 
 if __name__ == "__main__":
-    main()
+    mqtt_device_demo()
