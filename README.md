@@ -27,3 +27,8 @@
 ### Deployment command for routing cloud function : 
 
  gcloud functions deploy routing --runtime python37 --trigger-http --allow-unauthenticated
+
+
+### Deployment command for dom_search cloud function : 
+
+ gcloud functions deploy dom_search --runtime python37 --trigger-http --allow-unauthenticated
